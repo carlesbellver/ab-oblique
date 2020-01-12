@@ -16,10 +16,10 @@ BeepPin1 beep;
 Tinyfont tf = Tinyfont(ab.sBuffer, ab.width(), ab.height());
 #include "strategies.h"
 
-#define TIMES_SIZE 12
-uint16_t times[TIMES_SIZE] = {10,20,30,60,120,180,240,300,600,900,1200,1800};
-uint8_t min_c=2; uint16_t min=30*FSEC;  // 30 seconds - time you must wait to request a new strategy
-uint8_t max_c=5; uint16_t max=180*FSEC; //  3 minutes - max time before a new strategy is displayed
+#define TIMES_SIZE 18
+uint16_t times[TIMES_SIZE] = {0,1,2,3,4,5,10,15,30,60,120,180,240,300,600,900,1200,1800};
+uint8_t min_c=8; uint16_t min=30*FSEC;  // 30 seconds - time you must wait to request a new strategy
+uint8_t max_c=11; uint16_t max=180*FSEC; //  3 minutes - max time before a new strategy is displayed
 uint16_t start=3*FSEC; //  3 seconds - title screen delay
 
 uint16_t t=0;
@@ -156,7 +156,7 @@ void loop() {
       displayConf();
       break;
   }
-  Serial.write(arduboy.getBuffer(), 128*64/8);
+  Serial.write(ab.getBuffer(), 128*64/8);
   ab.display();
 }
 
@@ -228,31 +228,34 @@ void displayInfo(char const *s){
 }
 
 void displayTime(int t, int x, int y) {
-  if((t)<(60)){
+  if(t<60){
     // seconds
     ab.setCursor(x,y);
-    if((t)<10){
+    if(t<10){
       ab.print("0");
       ab.setCursor(x+6,y);
     }
     ab.print(t);
     ab.setCursor(x+18,y);
-    ab.print("seconds");
+    ab.print("second");
+    if(t!=1){
+      ab.setCursor(x+18+(6*6),y);
+      ab.print("s");
+    }
   }
   else {
     // minutes
     ab.setCursor(x,y);
-    if((t)<600){
+    if(t<600){
       ab.print("0");
       ab.setCursor(x+6,y);
     }
     ab.print(t/60);
     ab.setCursor(x+18,y);
-    if((t)==60){
-      ab.print("minute");
-    }
-    else{
-      ab.print("minutes");
+    ab.print("minute");
+    if(t>60){
+      ab.setCursor(x+18+(6*6),y);
+      ab.print("s");
     }
   }
 }
