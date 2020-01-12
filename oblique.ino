@@ -36,6 +36,7 @@ void setup() {
   beep.begin();
   ab.initRandomSeed();
   initEEPROM();
+  Serial.begin(9600);
   //displayTitle();
   ab.setTextWrap(false);
 }
@@ -155,6 +156,7 @@ void loop() {
       displayConf();
       break;
   }
+  Serial.write(arduboy.getBuffer(), 128*64/8);
   ab.display();
 }
 
