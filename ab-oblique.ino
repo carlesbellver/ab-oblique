@@ -29,6 +29,8 @@ int16_t s=-1;
 int16_t last=-1;
 uint8_t mode=0;
 uint8_t conf_pos;
+uint8_t min_c_last;
+uint8_t max_c_last;
 
 void setup() {
   ab.begin();
@@ -64,6 +66,8 @@ void loop() {
       else if(ab.justReleased(LEFT_BUTTON)){
         // to conf screen
         conf_pos=0;
+        min_c_last=min_c;
+        max_c_last=max_c;
         mode=3;
       }
       else if((s==-1)||(t>=max)||(ab.justPressed(A_BUTTON)&&(t>=min))){
@@ -103,6 +107,8 @@ void loop() {
       }
       else if(ab.justReleased(B_BUTTON)){
         // restore parameters and return to display strategy
+        min_c=min_c_last;
+        max_c=max_c_last;
         mode=1;
       }
       else if(ab.justReleased(UP_BUTTON)){
@@ -272,7 +278,7 @@ void displayConf(){
   //ab.setCursor(0,16+(20*conf_pos));
   //ab.print(">");
   ab.fillRect(0,16+(20*conf_pos),4,14);
-  displayInfo("A SAVE - B EXIT");
+  displayInfo("A SAVE - B CANCEL");
 }
 
 void displayTitle(){
