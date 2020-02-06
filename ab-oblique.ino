@@ -1,8 +1,8 @@
 // Carles Bellver Torlà
 // carles@carlesbellver.net
 // Oblique Strategies for Arduboy
-// version 0.2
-// 2020-01-12
+// version 0.2.1
+// 2020-01-18
 
 #define FSEC 10 // frames per second
 #define EEPROM_START EEPROM_STORAGE_SPACE_START
@@ -12,6 +12,8 @@
 #include <Arduboy2.h>
 Arduboy2 ab;
 BeepPin1 beep;
+#include <Arduboy2Core.h>
+Arduboy2Core core;
 #include <Tinyfont.h>
 Tinyfont tf = Tinyfont(ab.sBuffer, ab.width(), ab.height());
 #include "strategies.h"
@@ -21,6 +23,18 @@ uint16_t times[TIMES_SIZE] = {0,1,2,3,4,5,10,15,30,60,120,180,240,300,600,900,12
 uint8_t min_c=8; uint16_t min=30*FSEC;  // 30 seconds - time you must wait to request a new strategy
 uint8_t max_c=11; uint16_t max=180*FSEC; //  3 minutes - max time before a new strategy is displayed
 uint16_t start=3*FSEC; //  3 seconds - title screen delay
+
+// Easter Egg: button up+down turn RGB LED on
+// I use it as a simple don't disturb sign
+#define KICKSTARTER_RGB_LED // Many Kickstarter units were shipped with the RGB LED incorrectly installed
+#ifdef KICKSTARTER_RGB_LED 
+#define LIGHTS_SIZE 3
+uint8_t lights[LIGHTS_SIZE][3]={{RGB_OFF,RGB_OFF,RGB_OFF},{RGB_OFF,RGB_OFF,RGB_ON},{RGB_ON,RGB_OFF,RGB_OFF}}; // #0 must be all RGB_OFF
+#else
+#define LIGHTS_SIZE 4
+uint8_t lights[LIGHTS_SIZE][3]={{RGB_OFF,RGB_OFF,RGB_OFF},{RGB_ON,RGB_OFF,RGB_OFF},{RGB_ON,RGB_ON,RGB_OFF}, {RGB_OFF,RGB_ON,RGB_OFF}}; // #0 must be all RGB_OFF
+#endif
+uint8_t light=0;
 
 uint16_t t=0;
 char strategy[100];
@@ -59,7 +73,15 @@ void loop() {
       }
       break;
     case 1: // display strategy
-      if(ab.justPressed(B_BUTTON)){
+      if(ab.justReleased(UP_BUTTON) && ab.justReleased(DOWN_BUTTON)){
+        // cycle RGB LED
+        light++;
+        if(light>=LIGHTS_SIZE){
+          light=0;
+        }
+        core.digitalWriteRGB(lights[light][0],lights[light][1],lights[light][2]);
+      }
+      else if(ab.justPressed(B_BUTTON)){
         // title screen
         mode=2;
       }
